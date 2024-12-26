@@ -87,13 +87,25 @@
     let lastX = 0;
     let lastY = 0;
 
-    // Fungsi untuk memulai menggambar (untuk perangkat sentuh)
+    // Fungsi untuk mendapatkan posisi relatif canvas terhadap halaman
+    function getCanvasOffset() {
+      const rect = canvas.getBoundingClientRect();
+      return {
+        x: rect.left + window.pageXOffset,
+        y: rect.top + window.pageYOffset
+      };
+    }
+
+    // Fungsi untuk memulai menggambar (untuk perangkat sentuh dan mouse)
     function startDrawing(e) {
       e.preventDefault(); // Menghindari perilaku default seperti zoom pada perangkat sentuh
       isDrawing = true;
+
+      const offset = getCanvasOffset();
       const touch = e.touches ? e.touches[0] : e;
-      lastX = touch.clientX - canvas.offsetLeft;
-      lastY = touch.clientY - canvas.offsetTop;
+      lastX = touch.clientX - offset.x;
+      lastY = touch.clientY - offset.y;
+
       draw(e);
     }
 
@@ -101,9 +113,10 @@
     function draw(e) {
       if (!isDrawing) return;
 
+      const offset = getCanvasOffset();
       const touch = e.touches ? e.touches[0] : e;
-      const currentX = touch.clientX - canvas.offsetLeft;
-      const currentY = touch.clientY - canvas.offsetTop;
+      const currentX = touch.clientX - offset.x;
+      const currentY = touch.clientY - offset.y;
 
       ctx.lineWidth = 3; // Ketebalan garis
       ctx.lineCap = "round"; // Bentuk ujung garis
@@ -152,4 +165,5 @@
   </script>
 </body>
 </html>
+
 
