@@ -1,1 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Input Tanda Tangan</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      background-color: #f4f4f4;
+    }
+
+    .signature-pad {
+      border: 2px solid #000;
+      width: 500px;
+      height: 500px;
+      border-radius: 5px;
+      background-color: #fff;
+      cursor: crosshair;
+    }
+
+    .controls {
+      margin-top: 20px;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      background-color: #45a049;
+    }
+
+    .btn-clear {
+      background-color: #f44336;
+    }
+
+    .btn-clear:hover {
+      background-color: #e41e1e;
+    }
+
+    .signature-preview {
+      margin-top: 20px;
+      max-width: 100%;
+      border: 2px solid #000;
+      display: block;
+      max-height: 200px;
+      object-fit: contain;
+    }
+  </style>
+</head>
+<body>
+  <h2>Form Input Tanda Tangan</h2>
+  <p>Silakan gambar tanda tangan Anda di bawah ini:</p>
+
+  <!-- Canvas untuk tanda tangan -->
+  <canvas id="signature-pad" class="signature-pad"></canvas>
+
+  <div class="controls">
+    <!-- Tombol untuk menyimpan gambar tanda tangan -->
+    <button class="btn" id="save-signature">Simpan Tanda Tangan</button>
+    <!-- Tombol untuk membersihkan canvas -->
+    <button class="btn btn-clear" id="clear-signature">Bersihkan</button>
+  </div>
+
+  <!-- Tempat untuk menampilkan pratinjau tanda tangan -->
+  <img id="signature-preview" class="signature-preview" style="display:none;" alt="Tanda Tangan">
+
+  <script>
+    // Inisialisasi canvas untuk tanda tangan
+    const canvas = document.getElementById("signature-pad");
+    const ctx = canvas.getContext("2d");
+    
+    // Menyesuaikan ukuran canvas dengan ukuran layar
+    canvas.width = 500;
+    canvas.height = 200;
+
+    // Variabel untuk melacak apakah pengguna sedang menggambar atau tidak
+    let isDrawing = false;
+
+    // Fungsi untuk memulai menggambar
+    function startDrawing(e) {
+      isDrawing = true;
+      draw(e);
+    }
+
+    // Fungsi untuk menggambar di canvas
+    function draw(e) {
+      if (!isDrawing) return;
+
+      ctx.lineWidth = 3; // Ketebalan garis
+      ctx.lineCap = "round"; // Bentuk ujung garis
+      ctx.strokeStyle = "#000"; // Warna garis
+
+      ctx.lineTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
+      ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
+    }
+
+    // Fungsi untuk berhenti menggambar
+    function stopDrawing() {
+      isDrawing = false;
+      ctx.beginPath();
+    }
+
+    // Menambahkan event listeners untuk menggambar
+    canvas.addEventListener("mousedown", startDrawing);
+    canvas.addEventListener("mousemove", draw);
+    canvas.addEventListener("mouseup", stopDrawing);
+    canvas.addEventListener("mouseout", stopDrawing);
+
+    // Fungsi untuk menyimpan tanda tangan sebagai gambar
+    document.getElementById("save-signature").addEventListener("click", function() {
+      const dataURL = canvas.toDataURL(); // Mengonversi canvas menjadi gambar
+
+      // Menampilkan gambar tanda tangan pada elemen img
+      const signaturePreview = document.getElementById("signature-preview");
+      signaturePreview.src = dataURL;
+      signaturePreview.style.display = "block";
+    });
+
+    // Fungsi untuk membersihkan canvas
+    document.getElementById("clear-signature").addEventListener("click", function() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height); // Membersihkan canvas
+      const signaturePreview = document.getElementById("signature-preview");
+      signaturePreview.style.display = "none"; // Menyembunyikan pratinjau gambar
+    });
+  </script>
+</body>
+</html>
 
