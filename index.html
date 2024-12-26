@@ -13,7 +13,8 @@
 
     .signature-pad {
       border: 2px solid #000;
-      width: 500px;
+      width: 100%; /* Membuat canvas responsif */
+      max-width: 500px;
       height: 500px;
       border-radius: 5px;
       background-color: #fff;
@@ -83,10 +84,16 @@
 
     // Variabel untuk melacak apakah pengguna sedang menggambar atau tidak
     let isDrawing = false;
+    let lastX = 0;
+    let lastY = 0;
 
-    // Fungsi untuk memulai menggambar
+    // Fungsi untuk memulai menggambar (untuk perangkat sentuh)
     function startDrawing(e) {
+      e.preventDefault(); // Menghindari perilaku default seperti zoom pada perangkat sentuh
       isDrawing = true;
+      const touch = e.touches ? e.touches[0] : e;
+      lastX = touch.clientX - canvas.offsetLeft;
+      lastY = touch.clientY - canvas.offsetTop;
       draw(e);
     }
 
@@ -94,14 +101,18 @@
     function draw(e) {
       if (!isDrawing) return;
 
+      const touch = e.touches ? e.touches[0] : e;
+      const currentX = touch.clientX - canvas.offsetLeft;
+      const currentY = touch.clientY - canvas.offsetTop;
+
       ctx.lineWidth = 3; // Ketebalan garis
       ctx.lineCap = "round"; // Bentuk ujung garis
       ctx.strokeStyle = "#000"; // Warna garis
 
-      ctx.lineTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
+      ctx.lineTo(currentX, currentY);
       ctx.stroke();
       ctx.beginPath();
-      ctx.moveTo(e.clientX - canvas.offsetLeft, e.clientY - canvas.offsetTop);
+      ctx.moveTo(currentX, currentY);
     }
 
     // Fungsi untuk berhenti menggambar
@@ -110,7 +121,13 @@
       ctx.beginPath();
     }
 
-    // Menambahkan event listeners untuk menggambar
+    // Menambahkan event listeners untuk menggambar (untuk perangkat sentuh dan mouse)
+    canvas.addEventListener("touchstart", startDrawing);
+    canvas.addEventListener("touchmove", draw);
+    canvas.addEventListener("touchend", stopDrawing);
+    canvas.addEventListener("touchcancel", stopDrawing);
+
+    // Untuk perangkat desktop (mouse)
     canvas.addEventListener("mousedown", startDrawing);
     canvas.addEventListener("mousemove", draw);
     canvas.addEventListener("mouseup", stopDrawing);
